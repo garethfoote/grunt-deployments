@@ -99,7 +99,7 @@ module.exports = function(grunt) {
         db_replace(target_options.url,local_options.url,target_backup_paths.file);
         var sites = Object.keys(target_options.sites)
         sites.forEach(function(siteKey) {
-          db_replace( target_options.sites[siteKey].domain, local_options.sites[siteKey].domain, local_backup_paths.file );
+          db_replace( target_options.sites[siteKey].domain, local_options.sites[siteKey].domain, target_backup_paths.file );
         })
 
         // Backup Local DB
