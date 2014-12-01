@@ -48,6 +48,11 @@ module.exports = function(grunt) {
 
         // Search and Replace database refs
         db_replace( local_options.url, target_options.url, local_backup_paths.file );
+        // Iterate through the sites in config.json and replace the domains
+        var sites = Object.keys(local_options.sites)
+        sites.forEach(function(siteKey) {
+          db_replace( local_options.sites[siteKey].domain, target_options.sites[siteKey].domain, local_backup_paths.file );
+        })
 
         // Dump target DB
         db_dump(target_options, target_backup_paths);
@@ -92,6 +97,10 @@ module.exports = function(grunt) {
         db_dump(target_options, target_backup_paths );
 
         db_replace(target_options.url,local_options.url,target_backup_paths.file);
+        var sites = Object.keys(target_options.sites)
+        sites.forEach(function(siteKey) {
+          db_replace( target_options.sites[siteKey].domain, local_options.sites[siteKey].domain, local_backup_paths.file );
+        })
 
         // Backup Local DB
         db_dump(local_options, local_backup_paths);
