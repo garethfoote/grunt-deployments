@@ -42,18 +42,18 @@ module.exports = function(grunt) {
 
         grunt.log.subhead("Pushing database from 'Local' to '" + target_options.title + "'");
 
-
         // Dump local DB
         db_dump(local_options, local_backup_paths);
 
         // Search and Replace database refs
-        db_replace( local_options.url, target_options.url, local_backup_paths.file );
+        db_replace( local_options.domain, target_options.domain, local_backup_paths.file );
         // Iterate through the sites in config.json and replace the domains
 
         if (local_options.sites) {
           var sites = Object.keys(local_options.sites)
           
           sites.forEach(function(siteKey) {
+            db_replace( local_options.sites[siteKey].subdomain, target_options.sites[siteKey].subdomain, local_backup_paths.file );
             db_replace( local_options.sites[siteKey].domain, target_options.sites[siteKey].domain, local_backup_paths.file );
           })
         }
@@ -100,10 +100,11 @@ module.exports = function(grunt) {
         // Dump Target DB
         db_dump(target_options, target_backup_paths );
 
-        db_replace(target_options.url,local_options.url,target_backup_paths.file);
+        db_replace(target_options.domain,local_options.domain,target_backup_paths.file);
         if (target_options.sites) {
           var sites = Object.keys(target_options.sites)
           sites.forEach(function(siteKey) {
+            db_replace( target_options.sites[siteKey].subdomain, local_options.sites[siteKey].subdomain, target_backup_paths.file );
             db_replace( target_options.sites[siteKey].domain, local_options.sites[siteKey].domain, target_backup_paths.file );
           })
         }
@@ -147,16 +148,18 @@ module.exports = function(grunt) {
      * Imports a .sql file into the DB provided
      */
     function db_import(config, src) {
+      // src = 'backups/local/20150114/17-37-55/db_backup.sql'
+      // console.log(src)
 
         var cmd;
 
         // 1) Create cmd string from Lo-Dash template
         var tpl_mysql = grunt.template.process(tpls.mysql, {
             data: {
-                host: config.host,
-                user: config.user,
-                pass: config.pass,
-                database: config.database,
+                host: config.database.host,
+                user: config.database.user,
+                pass: config.database.pass,
+                database: config.database.name,
                 path: src
             }
         });
@@ -199,10 +202,10 @@ module.exports = function(grunt) {
         // 2) Compile MYSQL cmd via Lo-Dash template string
         var tpl_mysqldump = grunt.template.process(tpls.mysqldump, {
             data: {
-                user: config.user,
-                pass: config.pass,
-                database: config.database,
-                host: config.host
+                user: config.database.user,
+                pass: config.database.pass,
+                database: config.database.name,
+                host: config.database.host
             }
         });
 
@@ -264,9 +267,9 @@ module.exports = function(grunt) {
 
         search_replace: "sed -i '' 's#<%= search %>#<%= replace %>#g' <%= path %>",
 
-        mysqldump: "mysqldump -h <%= host %> -u<%= user %> -p<%= pass %> <%= database %>",
+        mysqldump: "mysqldump -h <%= host %> -u<%= user %> <%= database %>",
 
-        mysql: "mysql -h <%= host %> -u <%= user %> -p<%= pass %> <%= database %>",
+        mysql: "mysql -h <%= host %> -u <%= user %> <%= database %>",
 
         ssh: "ssh <%= host %>",
     };
