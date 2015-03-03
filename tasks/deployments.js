@@ -267,9 +267,9 @@ module.exports = function(grunt) {
 
         search_replace: "sed -i' ' 's#<%= search %>#<%= replace %>#g' <%= path %>",
 
-        mysqldump: "mysqldump -h <%= host %> -u<%= user %> <%= database %>",
+        mysqldump: "mysqldump -h <%= host %> -u<%= user %> -p<%= pass %> <%= database %>",
 
-        mysql: "mysql -h <%= host %> -u <%= user %> <%= database %>",
+        mysql: "mysql -h <%= host %> -u <%= user %> -p<%= pass %> <%= database %>",
 
         ssh: "ssh <%= host %>",
     };
