@@ -151,7 +151,7 @@ module.exports = function(grunt) {
       // src = 'backups/local/20150114/17-37-55/db_backup.sql'
       // console.log(src)
 
-        var cmd;
+        var cmd, host;
 
         // 1) Create cmd string from Lo-Dash template
         var tpl_mysql = grunt.template.process(tpls.mysql, {
@@ -170,6 +170,9 @@ module.exports = function(grunt) {
             grunt.log.writeln("Importing into local database");
             cmd = tpl_mysql + " < " + src;
         } else { // it's a remote connection
+            // We need to specify the ssh port.
+            host = config.hasOwnProperty('ssh_port') 
+                ? config.ssh_host + ' -p' + config.ssh_port : '';
             var tpl_ssh = grunt.template.process(tpls.ssh, {
                 data: {
                     host: config.ssh_host
@@ -194,7 +197,7 @@ module.exports = function(grunt) {
      */
     function db_dump(config, output_paths) {
 
-        var cmd;
+        var cmd, host;
 
         grunt.file.mkdir(output_paths.dir);
 
@@ -216,9 +219,12 @@ module.exports = function(grunt) {
             cmd = tpl_mysqldump;
 
         } else { // it's a remote connection
+            // We need to specify the ssh port.
+            host = config.hasOwnProperty('ssh_port') 
+                ? config.ssh_host + ' -p' + config.ssh_port : '';
             var tpl_ssh = grunt.template.process(tpls.ssh, {
                 data: {
-                    host: config.ssh_host
+                    host: host
                 }
             });
             grunt.log.writeln("Creating DUMP of remote database");
@@ -267,9 +273,9 @@ module.exports = function(grunt) {
 
         search_replace: "sed -i' ' 's#<%= search %>#<%= replace %>#g' <%= path %>",
 
-        mysqldump: "mysqldump -h <%= host %> -u<%= user %> -p<%= pass %> <%= database %>",
+        mysqldump: "mysqldump -h <%= host %> -u<%= user %> <% if(pass) { %>-p<%= pass %><% } %> <%= database %>",
 
-        mysql: "mysql -h <%= host %> -u <%= user %> -p<%= pass %> <%= database %>",
+        mysql: "mysql -h <%= host %> -u <%= user %> <% if(pass) { %>-p<%= pass %><% } %> <%= database %>",
 
         ssh: "ssh <%= host %>",
     };
