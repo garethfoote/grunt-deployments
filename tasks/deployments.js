@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 
         if (local_options.sites) {
           var sites = Object.keys(local_options.sites)
-          
+
           sites.forEach(function(siteKey) {
             db_replace( local_options.sites[siteKey].subdomain, target_options.sites[siteKey].subdomain, local_backup_paths.file );
             db_replace( local_options.sites[siteKey].domain, target_options.sites[siteKey].domain, local_backup_paths.file );
@@ -171,17 +171,18 @@ module.exports = function(grunt) {
             cmd = tpl_mysql + " < " + src;
         } else { // it's a remote connection
             // We need to specify the ssh port.
-            host = config.hasOwnProperty('ssh_port') 
+            host = config.hasOwnProperty('ssh_port')
                 ? config.ssh_host + ' -p' + config.ssh_port : '';
             var tpl_ssh = grunt.template.process(tpls.ssh, {
                 data: {
-                    host: config.ssh_host
+                    host: host
                 }
             });
 
             grunt.log.writeln("Importing DUMP into remote database");
 
             cmd = tpl_ssh + " '" + tpl_mysql + "' < " + src;
+
         }
 
          // Execute cmd
@@ -230,6 +231,7 @@ module.exports = function(grunt) {
             grunt.log.writeln("Creating DUMP of remote database");
 
             cmd = tpl_ssh + " \\ " + tpl_mysqldump;
+            // grunt.log.writeln(cmd);
         }
 
         // Capture output...
