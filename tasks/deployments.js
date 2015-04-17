@@ -172,7 +172,7 @@ module.exports = function(grunt) {
         } else { // it's a remote connection
             // We need to specify the ssh port.
             host = config.hasOwnProperty('ssh_port')
-                ? config.ssh_host + ' -p' + config.ssh_port : '';
+                ? config.ssh_host + ' -p' + config.ssh_port : config.ssh_host;
             var tpl_ssh = grunt.template.process(tpls.ssh, {
                 data: {
                     host: host
@@ -222,7 +222,7 @@ module.exports = function(grunt) {
         } else { // it's a remote connection
             // We need to specify the ssh port.
             host = config.hasOwnProperty('ssh_port') 
-                ? config.ssh_host + ' -p' + config.ssh_port : '';
+                ? config.ssh_host + ' -p' + config.ssh_port : config.ssh_host;
             var tpl_ssh = grunt.template.process(tpls.ssh, {
                 data: {
                     host: host
